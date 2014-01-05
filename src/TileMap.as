@@ -26,11 +26,14 @@ public class TileMap
   // _rangecache: cache for range query results.
   private var _rangecache:Dictionary;
 
-  // TileMap(bitmap, tilesize)
-  public function TileMap(bitmap:BitmapData, 
-			  tilesize:int)
+  // TileMap(tilecolor, tilesize)
+  public function TileMap(tilecolor:BitmapData, 
+			  tilesize:int, width:int, height:int)
   {
-    this.bitmap = bitmap;
+    this.bitmap = new BitmapData(width, height+1, false);
+    this.bitmap.copyPixels(tilecolor, 
+			   new Rectangle(0, 0, tilecolor.width, 1),
+			   new Point(0, 0));
     this.tilesize = tilesize;
 
     // Construct a lookup table.

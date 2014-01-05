@@ -34,7 +34,9 @@ public class GameScreen extends Screen
   public function GameScreen(width:int, height:int)
   {
     var tilesize:int = 16;
-    tilemap = new TileMap(mapimage.bitmapData, tilesize);
+    tilemap = new TileMap(mapimage.bitmapData, tilesize, 
+			  Math.floor(width/tilesize), 
+			  Math.floor(height/tilesize));
 
     scene = new Scene(width, height, tilemap, tilesimage.bitmapData);
     addChild(scene);
@@ -67,7 +69,6 @@ public class GameScreen extends Screen
       }
       i++;
     }
-    tilemap.setTile(p.x, p.y, Tile.GOAL);
     tilemap.goal = p;
     _busy = true;
   }
@@ -168,6 +169,7 @@ public class GameScreen extends Screen
   {
     _busy = false;
     visualizer.update(null);
+    scene.refreshTiles();
   }
 
   private function updateMap():void
@@ -220,6 +222,7 @@ public class GameScreen extends Screen
       }
       break;
     }
+    tilemap.setTile(tilemap.goal.x, tilemap.goal.y, Tile.GOAL);
     var plan:PlanMap = new PlanMap(tilemap, tilemap.goal, tilemap.bounds,
 				   player.tilebounds, player.speed, 
 				   player.jumpspeed, player.gravity);
