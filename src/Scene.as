@@ -90,6 +90,12 @@ public class Scene extends Sprite
     _mapimage.y = (_tilewindow.y*tilesize)-_window.y;
   }
 
+  // refreshTiles()
+  public function refreshTiles():void
+  {
+    _tilewindow = new Rectangle();
+  }
+
   // renderTiles(x, y)
   private function renderTiles(r:Rectangle):void
   {

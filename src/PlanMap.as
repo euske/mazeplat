@@ -70,7 +70,7 @@ public class PlanMap
 
   // fillPlan(plan, b)
   public function fillPlan(start:Point=null, n:int=1000,
-			   falldx:int=10, falldy:int=20):int
+			   falldx:int=10, falldy:int=20):Boolean
   {
     var obstacle:RangeMap = tilemap.getRangeMap(Tile.isObstacle);
     var stoppable:RangeMap = tilemap.getRangeMap(Tile.isStoppable);
@@ -78,7 +78,7 @@ public class PlanMap
 
     if (start != null &&
 	!stoppable.hasTile(start.x+cb.left, start.y+cb.bottom+1, 
-			   start.x+cb.right, start.y+cb.bottom+1)) return 0;
+			   start.x+cb.right, start.y+cb.bottom+1)) return false;
     
     var queue:Array = new Array();
     addQueue(queue, start, new PlanAction(goal));
@@ -88,7 +88,7 @@ public class PlanMap
       var a0:PlanAction = q.action;
       var p:Point = a0.p;
       var context:String = a0.context;
-      if (start != null && start.equals(p)) break;
+      if (start != null && start.equals(p)) return true;
       if (obstacle.hasTile(p.x+cb.left, p.y+cb.top, 
 			   p.x+cb.right, p.y+cb.bottom)) continue;
       if (context == null &&
@@ -231,7 +231,7 @@ public class PlanMap
       n--;
     }
 
-    return n;
+    return false;
   }
 
   // addQueue
