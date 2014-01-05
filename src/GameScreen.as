@@ -17,11 +17,6 @@ public class GameScreen extends Screen
   [Embed(source="../assets/tiles.png", mimeType="image/png")]
   private static const TilesImageCls:Class;
   private static const tilesimage:Bitmap = new TilesImageCls();
-
-  // Map image:
-  [Embed(source="../assets/map.png", mimeType="image/png")]
-  private static const MapImageCls:Class;
-  private static const mapimage:Bitmap = new MapImageCls();
   
   /// Game-related functions
 
@@ -34,7 +29,7 @@ public class GameScreen extends Screen
   public function GameScreen(width:int, height:int)
   {
     var tilesize:int = 16;
-    tilemap = new TileMap(mapimage.bitmapData, tilesize, 
+    tilemap = new TileMap(tilesize, 
 			  Math.floor(width/tilesize), 
 			  Math.floor(height/tilesize));
 

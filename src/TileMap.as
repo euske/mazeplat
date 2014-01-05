@@ -21,30 +21,15 @@ public class TileMap
   // tilesize: the size of each tile.
   public var tilesize:int;
 
-  // _tilevalue: lookup table from a pixel color to a type number.
-  private var _tilevalue:Dictionary;
   // _rangecache: cache for range query results.
   private var _rangecache:Dictionary;
+  private var _mapstack:Array;
 
-  // TileMap(tilecolor, tilesize)
-  public function TileMap(tilecolor:BitmapData, 
-			  tilesize:int, width:int, height:int)
+  // TileMap(tilesize, width, height)
+  public function TileMap(tilesize:int, width:int, height:int)
   {
-    this.bitmap = new BitmapData(width, height+1, false);
-    this.bitmap.copyPixels(tilecolor, 
-			   new Rectangle(0, 0, tilecolor.width, 1),
-			   new Point(0, 0));
+    this.bitmap = new BitmapData(width, height, false);
     this.tilesize = tilesize;
-
-    // Construct a lookup table.
-    // The color value at a pixel at (i,0) is used as i-th type.
-    _tilevalue = new Dictionary();
-    for (var i:int = 0; i < bitmap.width; i++) {
-      var c:uint = bitmap.getPixel(i, 0);
-      if (_tilevalue[c] === undefined) {
-	_tilevalue[c] = i;
-      }
-    }
   }
 
   // width: returns the map width.
@@ -55,7 +40,7 @@ public class TileMap
   // height: returns the map height.
   public function get height():int
   {
-    return bitmap.height-1;
+    return bitmap.height;
   }
   // bounds: returns the map bounds.
   public function get bounds():Rectangle
@@ -67,11 +52,10 @@ public class TileMap
   public function getTile(x:int, y:int):int
   {
     if (x < 0 || bitmap.width <= x || 
-	y < 0 || bitmap.height-1 <= y) {
+	y < 0 || bitmap.height <= y) {
       return -1;
     }
-    var c:uint = bitmap.getPixel(x, y+1);
-    return _tilevalue[c];
+    return bitmap.getPixel(x, y);
   }
 
   // isTile(x, y, f): true if the tile at (x,y) has a property given by f.
@@ -80,42 +64,46 @@ public class TileMap
     return f(getTile(x, y));
   }
 
-  // setTile(x, y, i): set the tile value of pixel at (x,y).
-  public function setTile(x:int, y:int, i:int):void
+  // setTile(x, y, c): set the tile value of pixel at (x,y).
+  public function setTile(x:int, y:int, c:uint):void
   {
-    var c:uint = bitmap.getPixel(i, 0);
-    bitmap.setPixel(x, y+1, c);
+    bitmap.setPixel(x, y, c);
     _rangecache = null;
   }
 
-  // fillTile(x0, y0, x1, y1, i): fill the tile with a given value.
-  public function fillTile(x0:int, y0:int, x1:int, y1:int, i:int):void
+  // fillTile(x0, y0, x1, y1, c): fill the tile with a given value.
+  public function fillTile(x0:int, y0:int, x1:int, y1:int, c:uint):void
   {
-    var c:uint = bitmap.getPixel(i, 0);
     for (var y:int = y0; y <= y1; y++) {
       for (var x:int = x0; x <= x1; x++) {
-	bitmap.setPixel(x, y+1, c);
+	bitmap.setPixel(x, y, c);
       }
     }
     _rangecache = null;
   }
 
-  private var _mapstack:Array = new Array();
   // saveMap
   public function saveMap():void
   {
+    if (_mapstack == null) {
+      _mapstack = new Array();
+    }
     _mapstack.push(bitmap);
     bitmap = bitmap.clone();
   }
+
   // restoreMap
   public function restoreMap():void
   {
-    bitmap = _mapstack.pop();
+    if (_mapstack != null) {
+      bitmap = _mapstack.pop();
+    }
   }
+
   // clearStack
   public function clearStack():void
   {
-    _mapstack = new Array();
+    _mapstack = null;
   }
   
   // scanTile(x0, y0, x1, y1, f): returns a list of tiles that has a given property.
