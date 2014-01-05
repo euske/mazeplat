@@ -10,6 +10,8 @@ import flash.utils.Dictionary;
 //
 public class TileMap
 {
+  public var goal:Point;
+
   // bitmap: actual bitmap to hold the 2D array.
   // The top row is used as a lookup table for tile types.
   // The color of pixel (0,0) is used as type 0.
@@ -52,6 +54,11 @@ public class TileMap
   {
     return bitmap.height-1;
   }
+  // bounds: returns the map bounds.
+  public function get bounds():Rectangle
+  {
+    return new Rectangle(0, 0, width, height);
+  }
 
   // getTile(x, y): returns the tile of a pixel at (x,y).
   public function getTile(x:int, y:int):int
@@ -76,6 +83,19 @@ public class TileMap
   public function isTile(x:int, y:int, f:Function):Boolean
   {
     return f(getTile(x, y));
+  }
+
+  private var _mapstack:Array = new Array();
+  // saveMap
+  public function saveMap():void
+  {
+    _mapstack.push(bitmap);
+    bitmap = bitmap.clone();
+  }
+  // restoreMap
+  public function restoreMap():void
+  {
+    bitmap = _mapstack.pop();
   }
   
   // scanTile(x0, y0, x1, y1, f): returns a list of tiles that has a given property.

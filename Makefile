@@ -12,7 +12,7 @@ FDB=$(JAVA) -jar $(FLEX_HOME)/lib/fdb.jar
 # Project settings
 CFLAGS=-static-rsls -debug=true
 TARGET=main.swf
-LIVE_URL=ludumdare.tabesugi.net:public/file/ludumdare.tabesugi.net/ppp/
+LIVE_URL=ludumdare.tabesugi.net:public/file/ludumdare.tabesugi.net/mazeplat/
 
 all: $(TARGET)
 

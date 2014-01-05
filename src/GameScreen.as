@@ -29,7 +29,6 @@ public class GameScreen extends Screen
   private var scene:Scene;
   private var player:Player;
   private var visualizer:PlanVisualizer;
-  private var goal:Point;
 
   public function GameScreen(width:int, height:int)
   {
@@ -37,6 +36,7 @@ public class GameScreen extends Screen
     tilemap = new TileMap(mapimage.bitmapData, tilesize);
 
     var i:int = 0;
+    var p:Point;
     while (true) {
       var y:int = tilemap.height-i*4;
       if (y <= 1) break;
@@ -45,10 +45,12 @@ public class GameScreen extends Screen
 	tilemap.setTile(x+1,y,Tile.BLOCK);
 	tilemap.setTile(x+2,y,Tile.BLOCK);
 	tilemap.setTile(x+3,y,Tile.BLOCK);
-	goal = new Point(x+3, y-1);
+	p = new Point(x+3, y-1);
       }
       i++;
     }
+    tilemap.setTile(p.x, p.y, Tile.GOAL);
+    tilemap.goal = p;
 
     scene = new Scene(width, height, tilemap, tilesimage.bitmapData);
     addChild(scene);
@@ -76,8 +78,7 @@ public class GameScreen extends Screen
   // update()
   public override function update():void
   {
-    var bounds:Rectangle = new Rectangle(0, 0, tilemap.width, tilemap.height);
-    var plan:PlanMap = new PlanMap(tilemap, goal, bounds, 
+    var plan:PlanMap = new PlanMap(tilemap, tilemap.goal, tilemap.bounds,
 				   player.tilebounds, player.speed, 
 				   player.jumpspeed, player.gravity);
     if (0 < plan.fillPlan(tilemap.getCoordsByPoint(player.pos))) {
