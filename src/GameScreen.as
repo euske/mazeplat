@@ -17,6 +17,11 @@ public class GameScreen extends Screen
   [Embed(source="../assets/tiles.png", mimeType="image/png")]
   private static const TilesImageCls:Class;
   private static const tilesimage:Bitmap = new TilesImageCls();
+
+  // Text image:
+  [Embed(source="../assets/text.png", mimeType="image/png")]
+  private static const TextImageCls:Class;
+  private static const textimage:Bitmap = new TextImageCls();
   
   /// Game-related functions
 
@@ -44,6 +49,9 @@ public class GameScreen extends Screen
 
     visualizer = new PlanVisualizer(scene);
     addChild(visualizer);
+
+    textimage.x = (width-textimage.width)/2;
+    textimage.y = (height-textimage.height)/2;
   }
 
   // open()
@@ -66,6 +74,7 @@ public class GameScreen extends Screen
     }
     tilemap.goal = p;
     _busy = true;
+    addChild(textimage);
   }
 
   // close()
@@ -81,6 +90,10 @@ public class GameScreen extends Screen
     scene.update();
     scene.setCenter(player.pos, 100, 100);
     scene.paint();
+
+    if (tilemap.getCoordsByPoint(player.pos).equals(tilemap.goal)) {
+      dispatchEvent(new ScreenEvent(NAME));
+    }
   }
 
   // keydown(keycode)
@@ -162,7 +175,10 @@ public class GameScreen extends Screen
 
   private function stopUpdating():void
   {
+    if (!_busy) return;
+
     _busy = false;
+    removeChild(textimage);
     visualizer.update(null);
     scene.refreshTiles();
   }
