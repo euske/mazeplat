@@ -14,8 +14,8 @@ public class Actor
 
   public const gravity:int = 1;
   public const speed:int = 4;
-  public const jumpspeed:int = 12;
-  public const maxspeed:int = 12;
+  public const jumpspeed:int = 10;
+  public const maxspeed:int = 10;
 
   private var _scene:Scene;
   private var _velocity:Point;

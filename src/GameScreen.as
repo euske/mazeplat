@@ -53,7 +53,7 @@ public class GameScreen extends Screen
     var i:int = 0;
     var p:Point;
     while (true) {
-      var y:int = tilemap.height-i*4;
+      var y:int = tilemap.height-i*3;
       if (y <= 1) break;
       for (var x:int = (i%2)*4; x < tilemap.width; x += 8) {
 	tilemap.setTile(x+0, y, Tile.BLOCK);
@@ -171,12 +171,14 @@ public class GameScreen extends Screen
   {
     if (!_busy) return;
 
+    const N1:int = 8;
+
     tilemap.saveMap();
     var x:int, y:int, w:int, h:int, dx:int, dy:int;
     switch ((int)(Math.random()*4)) {
     case 1:
       // horizontal wall.
-      w = (int)(Math.random()*10);
+      w = (int)(Math.random()*N1);
       x = (int)(Math.random()*(tilemap.width-w));
       y = (int)(Math.random()*tilemap.height);
       for (dx = 0; dx < w; dx++) {
@@ -186,7 +188,7 @@ public class GameScreen extends Screen
 
     case 2:
       // vertical wall.
-      h = (int)(Math.random()*10);
+      h = (int)(Math.random()*N1);
       x = (int)(Math.random()*tilemap.width);
       y = (int)(Math.random()*(tilemap.height-h));
       for (dy = 0; dy < h; dy++) {
@@ -196,7 +198,7 @@ public class GameScreen extends Screen
 
     case 3:
       // vertical ladder.
-      h = (int)(Math.random()*10);
+      h = (int)(Math.random()*N1);
       x = (int)(Math.random()*tilemap.width);
       y = (int)(Math.random()*(tilemap.height-h));
       for (dy = 0; dy < h; dy++) {
@@ -206,8 +208,8 @@ public class GameScreen extends Screen
 
     default:
       // making a hole.
-      w = (int)(Math.random()*10);
-      h = (int)(Math.random()*10);
+      w = (int)(Math.random()*N1);
+      h = (int)(Math.random()*N1);
       x = (int)(Math.random()*(tilemap.width-w));
       y = (int)(Math.random()*(tilemap.height-h));
       for (dy = 0; dy < h; dy++) {
