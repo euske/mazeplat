@@ -31,7 +31,7 @@ public class Player extends Actor
       var y0:int = r.top;
       var y1:int = r.bottom;
       for each (p in a) {
-	t = tilemap.getTileRect(p.x, p.y);
+	t = scene.getTileRect(p.x, p.y);
 	if (t.top < y0) {
 	  y0 = Math.max(y0, t.bottom);
 	} else if (y1 < t.bottom) {
@@ -49,7 +49,7 @@ public class Player extends Actor
       var x0:int = r.left;
       var x1:int = r.right;
       for each (p in a) {
-	t = tilemap.getTileRect(p.x, p.y);
+	t = scene.getTileRect(p.x, p.y);
 	if (t.left < x0) {
 	  x0 = Math.max(x0, t.right);
 	} else if (x1 < t.right) {

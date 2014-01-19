@@ -11,6 +11,8 @@ import flash.utils.Dictionary;
 public class TileMap
 {
   public var goal:Point;
+  public var score:int;
+  public var plan:PlanMap;
 
   // bitmap: actual bitmap to hold the 2D array.
   // The top row is used as a lookup table for tile types.
@@ -56,6 +58,7 @@ public class TileMap
     var tilemap:TileMap = new TileMap(tilesize, bitmap.width, bitmap.height, 
 				      bitmap.clone());
     tilemap.goal = goal;
+    tilemap.score = score;
     return tilemap;
   }
 
@@ -191,18 +194,6 @@ public class TileMap
     return r;
   }
 
-  // getTilePoint(x, y): converts a point in the map to screen space.
-  public function getTilePoint(x:int, y:int):Point
-  {
-    return new Point(x*tilesize+tilesize/2, y*tilesize+tilesize/2);
-  }
-
-  // getTileRect(x, y): converts an area in the map to screen space.
-  public function getTileRect(x:int, y:int, w:int=1, h:int=1):Rectangle
-  {
-    return new Rectangle(x*tilesize, y*tilesize, w*tilesize, h*tilesize);
-  }
-
   // getCoordsByPoint(p): converts a screen position to map coordinates.
   public function getCoordsByPoint(p:Point):Point
   {
@@ -226,20 +217,6 @@ public class TileMap
   {
     r = getCoordsByRect(r);
     return scanTile(r.left, r.top, r.right-1, r.bottom-1, f);
-  }
-
-  // getCollisionByRect(r, vx, vy, f): 
-  //   adjusts vector (vx,vy) so that the rectangle doesn't collide with a tile specified by f.
-  public function getCollisionByRect(r:Rectangle, vx:int, vy:int, f:Function):Point
-  {
-    var src:Rectangle = r.union(Utils.moveRect(r, vx, vy));
-    var a:Array = scanTileByRect(src, f);
-    var v:Point = new Point(vx, vy);
-    for each (var p:Point in a) {
-      var t:Rectangle = getTileRect(p.x, p.y);
-      v = Utils.collideRect(t, r, v);
-    }
-    return v;
   }
 
 }

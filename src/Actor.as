@@ -111,14 +111,14 @@ public class Actor
     if (!isGrabbing() && !isLanded()) {
       var v:Point;
       // falling (in x and y).
-      v = tilemap.getCollisionByRect(bounds, _velocity.x, _velocity.y, 
-				     Tile.isStoppable);
+      v = scene.getCollisionByRect(bounds, _velocity.x, _velocity.y, 
+				   Tile.isStoppable);
       // falling (in x).
-      v.x = tilemap.getCollisionByRect(bounds, _velocity.x, v.y, 
-				       Tile.isObstacle).x;
+      v.x = scene.getCollisionByRect(bounds, _velocity.x, v.y, 
+				     Tile.isObstacle).x;
       // falling (in y).
-      v.y = tilemap.getCollisionByRect(bounds, v.x, _velocity.y, 
-				       Tile.isStoppable).y;
+      v.y = scene.getCollisionByRect(bounds, v.x, _velocity.y, 
+				     Tile.isStoppable).y;
       pos = Utils.movePoint(pos, v.x, v.y);
       _velocity = new Point(v.x, Math.min(v.y+gravity, maxspeed));
     }
@@ -129,14 +129,14 @@ public class Actor
   {
     if (isGrabbing()) {
       // climing a ladder.
-      v = tilemap.getCollisionByRect(bounds, v.x, v.y, 
-				     Tile.isObstacle);
+      v = scene.getCollisionByRect(bounds, v.x, v.y, 
+				   Tile.isObstacle);
       pos = Utils.movePoint(pos, v.x, v.y);
       _velocity = new Point();
     } else if (isLanded()) {
       // moving.
-      v = tilemap.getCollisionByRect(bounds, v.x, Math.max(0, v.y), 
-				     Tile.isObstacle);
+      v = scene.getCollisionByRect(bounds, v.x, Math.max(0, v.y), 
+				   Tile.isObstacle);
       pos = Utils.movePoint(pos, v.x, v.y);
       _velocity = new Point();
     } else {

@@ -50,9 +50,6 @@ public class GameScreen extends Screen
   public override function open():void
   {
     var tilemap:TileMap = scene.createTileMap();
-    player.pos = tilemap.getTilePoint(0, tilemap.height-1);
-    player.bounds = tilemap.getTileRect(0, tilemap.height-2, 1, 2);
-
     tilemap.fillTile(0, 0, tilemap.width, tilemap.height, Tile.NONE);
     var i:int = 0;
     var p:Point;
@@ -69,6 +66,10 @@ public class GameScreen extends Screen
       i++;
     }
     tilemap.goal = p;
+    tilemap.setTile(tilemap.goal.x, tilemap.goal.y, Tile.GOAL);
+
+    player.pos = scene.getTilePoint(0, tilemap.height-1);
+    player.bounds = scene.getTileRect(0, tilemap.height-2, 1, 2);
 
     startUpdating(tilemap);
   }
@@ -170,7 +171,8 @@ public class GameScreen extends Screen
   }
 
   private var _busy:Boolean;
-  private var _mapstack:Array;
+  private var _mapqueue:Array;
+  private const BEAM_SIZE:int = 10;
 
   private function startUpdating(tilemap:TileMap):void
   {
@@ -178,8 +180,10 @@ public class GameScreen extends Screen
 
     addChild(textimage);
     _busy = true;
-    _mapstack = new Array();
-    _mapstack.push(tilemap);
+    _mapqueue = new Array();
+    _mapqueue.push(tilemap);
+
+    scene.tilemap = tilemap;
   }
 
   private function stopUpdating():void
@@ -187,7 +191,7 @@ public class GameScreen extends Screen
     if (!_busy) return;
 
     _busy = false;
-    _mapstack = null;
+    _mapqueue = null;
     removeChild(textimage);
     visualizer.update(null);
   }
@@ -198,67 +202,79 @@ public class GameScreen extends Screen
 
     const N1:int = 8;
 
-    var tilemap:TileMap = _mapstack.pop();
-
-    var x:int, y:int, w:int, h:int, dx:int, dy:int;
-    switch ((int)(Math.random()*6)) {
-    case 0:
-    case 1:
+    var tilemap:TileMap;
+    var n:int = _mapqueue.length;
+    for (var i:int = 0; i < n; i++) {
+      var x:int, y:int, w:int, h:int, dx:int, dy:int;
+      var m:int = Math.floor(Math.random()*6);
+      tilemap = _mapqueue[i].clone();
+      switch (m) {
+      case 0:
+      case 1:
       // horizontal wall.
-      w = (int)(Math.random()*N1);
-      x = (int)(Math.random()*(tilemap.width-w));
-      y = (int)(Math.random()*tilemap.height);
-      for (dx = 0; dx < w; dx++) {
-	tilemap.setTile(x+dx, y, Tile.BLOCK);
-      }
-      break;
-
-    case 2:
-      // vertical wall.
-      h = (int)(Math.random()*N1);
-      x = (int)(Math.random()*tilemap.width);
-      y = (int)(Math.random()*(tilemap.height-h));
-      for (dy = 0; dy < h; dy++) {
-	tilemap.setTile(x, y+dy, Tile.BLOCK);
-      }
-      break;
-
-    case 3:
-      // vertical ladder.
-      h = (int)(Math.random()*N1);
-      x = (int)(Math.random()*tilemap.width);
-      y = (int)(Math.random()*(tilemap.height-h));
-      for (dy = 0; dy < h; dy++) {
-	tilemap.setTile(x, y+dy, Tile.LADDER);
-      }
-      break;
-
-    default:
-      // 4, 5
-      // making a hole.
-      w = (int)(Math.random()*N1);
-      h = (int)(Math.random()*N1);
-      x = (int)(Math.random()*(tilemap.width-w));
-      y = (int)(Math.random()*(tilemap.height-h));
-      for (dy = 0; dy < h; dy++) {
+	w = (int)(Math.random()*N1);
+	x = (int)(Math.random()*(tilemap.width-w));
+	y = (int)(Math.random()*tilemap.height);
 	for (dx = 0; dx < w; dx++) {
-	  tilemap.setTile(x+dx, y+dy, Tile.NONE);
+	  tilemap.setTile(x+dx, y, Tile.BLOCK);
 	}
-      }
-      break;
-    }
-    tilemap.setTile(tilemap.goal.x, tilemap.goal.y, Tile.GOAL);
-    var plan:PlanMap = new PlanMap(tilemap, tilemap.goal, tilemap.bounds,
-				   player.tilebounds, player.speed, 
-				   player.jumpspeed, player.gravity);
-    var action:PlanAction = plan.fillPlan(tilemap.getCoordsByPoint(player.pos));
-    if (action != null) {
-      visualizer.update(plan);
-      scene.tilemap = tilemap;
-    }
-    _mapstack.push(tilemap);
-  }
+	break;
+	
+      case 2:
+	// vertical wall.
+	h = (int)(Math.random()*N1);
+	x = (int)(Math.random()*tilemap.width);
+	y = (int)(Math.random()*(tilemap.height-h));
+	for (dy = 0; dy < h; dy++) {
+	  tilemap.setTile(x, y+dy, Tile.BLOCK);
+	}
+	break;
+	
+      case 3:
+	// vertical ladder.
+	h = (int)(Math.random()*N1);
+	x = (int)(Math.random()*tilemap.width);
+	y = (int)(Math.random()*(tilemap.height-h));
+	for (dy = 0; dy < h; dy++) {
+	  tilemap.setTile(x, y+dy, Tile.LADDER);
+	}
+	break;
 
+      default:
+	// 4, 5
+	// making a hole.
+	w = (int)(Math.random()*N1);
+	h = (int)(Math.random()*N1);
+	x = (int)(Math.random()*(tilemap.width-w));
+	y = (int)(Math.random()*(tilemap.height-h));
+	for (dy = 0; dy < h; dy++) {
+	  for (dx = 0; dx < w; dx++) {
+	    tilemap.setTile(x+dx, y+dy, Tile.NONE);
+	  }
+	}
+	break;
+      }
+
+      tilemap.plan = new PlanMap(tilemap, tilemap.goal, tilemap.bounds,
+				 player.tilebounds, player.speed, 
+				 player.jumpspeed, player.gravity);
+      var action:PlanAction = tilemap.plan.fillPlan(tilemap.getCoordsByPoint(player.pos));
+      if (action == null) continue;
+      tilemap.score = action.cost;
+      _mapqueue.push(tilemap);
+    }
+
+    _mapqueue.sortOn("score", Array.NUMERIC | Array.DESCENDING);
+    if (BEAM_SIZE < _mapqueue.length) {
+      _mapqueue.splice(BEAM_SIZE, _mapqueue.length-BEAM_SIZE);
+    }
+    if (0 < _mapqueue.length) {
+      tilemap = _mapqueue[0];
+      visualizer.update(tilemap.plan);
+      scene.tilemap = tilemap;
+      //Main.log("queue="+_mapqueue.length+", xscore="+tilemap.score);
+    }
+  }
 }
 
 } // package
