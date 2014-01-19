@@ -114,6 +114,14 @@ public class Scene extends Sprite
     _tilewindow = r;
   }
 
+  // createTileMap
+  public function createTileMap():TileMap
+  {
+    return new TileMap(_tilesize, 
+		       Math.floor(_window.width/_tilesize),
+		       Math.floor(_window.height/_tilesize));
+  }
+
   // setCenter(p)
   public function setCenter(p:Point, hmargin:int, vmargin:int):void
   {
