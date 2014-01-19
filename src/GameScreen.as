@@ -241,7 +241,8 @@ public class GameScreen extends Screen
     var plan:PlanMap = new PlanMap(tilemap, tilemap.goal, tilemap.bounds,
 				   player.tilebounds, player.speed, 
 				   player.jumpspeed, player.gravity);
-    if (plan.fillPlan(tilemap.getCoordsByPoint(player.pos))) {
+    var action:PlanAction = plan.fillPlan(tilemap.getCoordsByPoint(player.pos));
+    if (action != null) {
       visualizer.update(plan);
       tilemap.clearStack();
       scene.refreshTiles();

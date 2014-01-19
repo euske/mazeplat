@@ -33,3 +33,6 @@ update:
 
 $(TARGET): .\src\*.as .\assets\*.*
 	$(MXMLC) $(CFLAGS) -compiler.source-path=.\src\ -o $@ .\src\Main.as
+
+$(TARGET_DEBUG): .\src\*.as .\assets\*.*
+	$(MXMLC) $(CFLAGS) $(CFLAGS_DEBUG) -compiler.source-path=.\src\ -o $@ .\src\Main.as
