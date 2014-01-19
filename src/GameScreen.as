@@ -191,7 +191,8 @@ public class GameScreen extends Screen
 
     tilemap.saveMap();
     var x:int, y:int, w:int, h:int, dx:int, dy:int;
-    switch ((int)(Math.random()*4)) {
+    switch ((int)(Math.random()*6)) {
+    case 0:
     case 1:
       // horizontal wall.
       w = (int)(Math.random()*N1);
@@ -223,6 +224,7 @@ public class GameScreen extends Screen
       break;
 
     default:
+      // 4, 5
       // making a hole.
       w = (int)(Math.random()*N1);
       h = (int)(Math.random()*N1);
