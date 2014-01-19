@@ -19,26 +19,30 @@ public class Scene extends Sprite
   private var _actors:Array;
 
   // Scene(width, height, tilemap)
-  public function Scene(width:int, height:int, 
-			tilemap:TileMap, tiles:BitmapData)
+  public function Scene(width:int, height:int, tiles:BitmapData)
   {
     _window = new Rectangle(0, 0, width, height);
-    _tilemap = tilemap;
     _tiles = tiles;
-    _tilewindow = new Rectangle();
-    _mapimage = new Bitmap(new BitmapData(width+tilemap.tilesize, 
-					  height+tilemap.tilesize, 
-					  true, 0x00000000));
-    _mapsize = new Point(tilemap.width*tilemap.tilesize,
-			 tilemap.height*tilemap.tilesize);
     _actors = new Array();
-    addChild(_mapimage);
   }
 
   // tilemap
   public function get tilemap():TileMap
   {
     return _tilemap;
+  }
+  public function set tilemap(value:TileMap):void
+  {
+    _tilemap = value;
+    _tilewindow = new Rectangle();
+    if (_mapimage == null) {
+      _mapsize = new Point(_tilemap.width*_tilemap.tilesize,
+			   _tilemap.height*_tilemap.tilesize);
+      _mapimage = new Bitmap(new BitmapData(width+_tilemap.tilesize, 
+					    height+_tilemap.tilesize, 
+					    true, 0x00000000));
+      addChild(_mapimage);
+    }
   }
 
   // window
@@ -88,12 +92,6 @@ public class Scene extends Sprite
     }
     _mapimage.x = (_tilewindow.x*tilesize)-_window.x;
     _mapimage.y = (_tilewindow.y*tilesize)-_window.y;
-  }
-
-  // refreshTiles()
-  public function refreshTiles():void
-  {
-    _tilewindow = new Rectangle();
   }
 
   // renderTiles(x, y)

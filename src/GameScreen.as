@@ -38,7 +38,7 @@ public class GameScreen extends Screen
 			  Math.floor(width/tilesize), 
 			  Math.floor(height/tilesize));
 
-    scene = new Scene(width, height, tilemap, tilesimage.bitmapData);
+    scene = new Scene(width, height, tilesimage.bitmapData);
     addChild(scene);
 
     player = new Player(scene);
@@ -75,6 +75,7 @@ public class GameScreen extends Screen
     tilemap.goal = p;
     _busy = true;
     addChild(textimage);
+    scene.tilemap = tilemap;
   }
 
   // close()
@@ -180,7 +181,6 @@ public class GameScreen extends Screen
     _busy = false;
     removeChild(textimage);
     visualizer.update(null);
-    scene.refreshTiles();
   }
 
   private function updateMap():void
@@ -245,7 +245,7 @@ public class GameScreen extends Screen
     if (action != null) {
       visualizer.update(plan);
       tilemap.clearStack();
-      scene.refreshTiles();
+      scene.tilemap = tilemap;
     } else {
       tilemap.restoreMap();
     }
