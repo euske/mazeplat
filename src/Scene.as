@@ -15,7 +15,6 @@ public class Scene extends Sprite
   private var _tilewindow:Rectangle;
   private var _tiles:BitmapData;
   private var _mapimage:Bitmap;
-  private var _mapsize:Point;
   private var _actors:Array;
 
   // Scene(width, height, tilemap)
@@ -33,13 +32,15 @@ public class Scene extends Sprite
   }
   public function set tilemap(value:TileMap):void
   {
+    if (_mapimage != null) {
+      removeChild(_mapimage);
+      _mapimage = null;
+    }
     _tilemap = value;
     _tilewindow = new Rectangle();
     if (_mapimage == null) {
-      _mapsize = new Point(_tilemap.width*_tilemap.tilesize,
-			   _tilemap.height*_tilemap.tilesize);
-      _mapimage = new Bitmap(new BitmapData(width+_tilemap.tilesize, 
-					    height+_tilemap.tilesize, 
+      _mapimage = new Bitmap(new BitmapData(_window.width+_tilemap.tilesize, 
+					    _window.height+_tilemap.tilesize, 
 					    true, 0x00000000));
       addChild(_mapimage);
     }
@@ -81,17 +82,19 @@ public class Scene extends Sprite
       actor.skin.x = p.x+actor.frame.x;
       actor.skin.y = p.y+actor.frame.y;
     }
-    var tilesize:int = _tilemap.tilesize;
-    var x0:int = Math.floor(_window.left/tilesize);
-    var y0:int = Math.floor(_window.top/tilesize);
-    var x1:int = Math.ceil(_window.right/tilesize);
-    var y1:int = Math.ceil(_window.bottom/tilesize);
-    var r:Rectangle = new Rectangle(x0, y0, x1-x0+1, y1-y0+1);
-    if (!_tilewindow.equals(r)) {
-      renderTiles(r);
+    if (_tilemap != null && _mapimage != null) {
+      var tilesize:int = _tilemap.tilesize;
+      var x0:int = Math.floor(_window.left/tilesize);
+      var y0:int = Math.floor(_window.top/tilesize);
+      var x1:int = Math.ceil(_window.right/tilesize);
+      var y1:int = Math.ceil(_window.bottom/tilesize);
+      var r:Rectangle = new Rectangle(x0, y0, x1-x0+1, y1-y0+1);
+      if (!_tilewindow.equals(r)) {
+	renderTiles(r);
+      }
+      _mapimage.x = (_tilewindow.x*tilesize)-_window.x;
+      _mapimage.y = (_tilewindow.y*tilesize)-_window.y;
     }
-    _mapimage.x = (_tilewindow.x*tilesize)-_window.x;
-    _mapimage.y = (_tilewindow.y*tilesize)-_window.y;
   }
 
   // renderTiles(x, y)
@@ -114,20 +117,24 @@ public class Scene extends Sprite
   // setCenter(p)
   public function setCenter(p:Point, hmargin:int, vmargin:int):void
   {
-    // Center the window position.
-    if (_mapsize.x < _window.width) {
-      _window.x = -(_window.width-_mapsize.x)/2;
-    } else if (p.x-hmargin < _window.x) {
-      _window.x = Math.max(0, p.x-hmargin);
-    } else if (_window.x+_window.width < p.x+hmargin) {
-      _window.x = Math.min(_mapsize.x, p.x+hmargin)-_window.width;
-    }
-    if (_mapsize.y < _window.height) {
-      _window.y = -(_window.height-_mapsize.y)/2;
-    } else if (p.y-vmargin < _window.y) {
-      _window.y = Math.max(0, p.y-vmargin);
-    } else if (_window.y+_window.height < p.y+vmargin) {
-      _window.y = Math.min(_mapsize.y, p.y+vmargin)-_window.height;
+    if (_tilemap != null) {
+      // Center the window position.
+      var mapwidth:int = _tilemap.width*_tilemap.tilesize;
+      var mapheight:int = _tilemap.height*_tilemap.tilesize;
+      if (mapwidth < _window.width) {
+	_window.x = -(_window.width-mapwidth)/2;
+      } else if (p.x-hmargin < _window.x) {
+	_window.x = Math.max(0, p.x-hmargin);
+      } else if (_window.x+_window.width < p.x+hmargin) {
+	_window.x = Math.min(mapwidth, p.x+hmargin)-_window.width;
+      }
+      if (mapheight < _window.height) {
+	_window.y = -(_window.height-mapheight)/2;
+      } else if (p.y-vmargin < _window.y) {
+	_window.y = Math.max(0, p.y-vmargin);
+      } else if (_window.y+_window.height < p.y+vmargin) {
+	_window.y = Math.min(mapheight, p.y+vmargin)-_window.height;
+      }
     }
   }
 

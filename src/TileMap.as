@@ -23,12 +23,14 @@ public class TileMap
 
   // _rangecache: cache for range query results.
   private var _rangecache:Dictionary;
-  private var _mapstack:Array;
 
   // TileMap(tilesize, width, height)
-  public function TileMap(tilesize:int, width:int, height:int)
+  public function TileMap(tilesize:int, width:int, height:int, bitmap:BitmapData=null)
   {
-    this.bitmap = new BitmapData(width, height, false);
+    if (bitmap == null) {
+      bitmap = new BitmapData(width, height, false);
+    }
+    this.bitmap = bitmap;
     this.tilesize = tilesize;
   }
 
@@ -46,6 +48,15 @@ public class TileMap
   public function get bounds():Rectangle
   {
     return new Rectangle(0, 0, width, height);
+  }
+
+  // clone(): returns a cloned TileMap.
+  public function clone():TileMap
+  {
+    var tilemap:TileMap = new TileMap(tilesize, bitmap.width, bitmap.height, 
+				      bitmap.clone());
+    tilemap.goal = goal;
+    return tilemap;
   }
 
   // getTile(x, y): returns the tile of a pixel at (x,y).
@@ -80,30 +91,6 @@ public class TileMap
       }
     }
     _rangecache = null;
-  }
-
-  // saveMap
-  public function saveMap():void
-  {
-    if (_mapstack == null) {
-      _mapstack = new Array();
-    }
-    _mapstack.push(bitmap);
-    bitmap = bitmap.clone();
-  }
-
-  // restoreMap
-  public function restoreMap():void
-  {
-    if (_mapstack != null) {
-      bitmap = _mapstack.pop();
-    }
-  }
-
-  // clearStack
-  public function clearStack():void
-  {
-    _mapstack = null;
   }
   
   // scanTile(x0, y0, x1, y1, f): returns a list of tiles that has a given property.

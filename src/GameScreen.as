@@ -25,26 +25,25 @@ public class GameScreen extends Screen
   
   /// Game-related functions
 
-  private var tilemap:TileMap;
   private var scene:Scene;
   private var player:Player;
   private var visualizer:PlanVisualizer;
-  private var _busy:Boolean;
 
   public function GameScreen(width:int, height:int)
   {
     var tilesize:int = 16;
-    tilemap = new TileMap(tilesize, 
-			  Math.floor(width/tilesize), 
-			  Math.floor(height/tilesize));
+    var tilemap:TileMap = new TileMap(tilesize, 
+				      Math.floor(width/tilesize), 
+				      Math.floor(height/tilesize));
 
     scene = new Scene(width, height, tilesimage.bitmapData);
+    scene.tilemap = tilemap;
     addChild(scene);
 
     player = new Player(scene);
     player.pos = tilemap.getTilePoint(0, tilemap.height-1);
     player.bounds = tilemap.getTileRect(0, tilemap.height-2, 1, 2);
-    player.skin = createSkin(tilesize*1, tilesize*2, 0x44ff44);
+    player.skin = createSkin(16, 32, 0x44ff44);
     scene.add(player);
 
     visualizer = new PlanVisualizer(scene);
@@ -57,6 +56,8 @@ public class GameScreen extends Screen
   // open()
   public override function open():void
   {
+    var tilemap:TileMap = scene.tilemap;
+
     tilemap.fillTile(0, 0, tilemap.width, tilemap.height, Tile.NONE);
     var i:int = 0;
     var p:Point;
@@ -73,9 +74,9 @@ public class GameScreen extends Screen
       i++;
     }
     tilemap.goal = p;
-    _busy = true;
-    addChild(textimage);
     scene.tilemap = tilemap;
+
+    //startUpdating(tilemap);
   }
 
   // close()
@@ -92,7 +93,7 @@ public class GameScreen extends Screen
     scene.setCenter(player.pos, 100, 100);
     scene.paint();
 
-    if (tilemap.getCoordsByPoint(player.pos).equals(tilemap.goal)) {
+    if (scene.tilemap.getCoordsByPoint(player.pos).equals(scene.tilemap.goal)) {
       dispatchEvent(new ScreenEvent(NAME));
     }
   }
@@ -174,11 +175,24 @@ public class GameScreen extends Screen
     return shape;
   }
 
+  private var _busy:Boolean;
+  private var _mapstack:Array;
+
+  private function startUpdating():void
+  {
+    if (_busy) return;
+
+    addChild(textimage);
+    _busy = true;
+    _mapstack = new Array();
+  }
+
   private function stopUpdating():void
   {
     if (!_busy) return;
 
     _busy = false;
+    _mapstack = null;
     removeChild(textimage);
     visualizer.update(null);
   }
@@ -189,7 +203,8 @@ public class GameScreen extends Screen
 
     const N1:int = 8;
 
-    tilemap.saveMap();
+    var tilemap:TileMap = scene.tilemap.clone();
+
     var x:int, y:int, w:int, h:int, dx:int, dy:int;
     switch ((int)(Math.random()*6)) {
     case 0:
@@ -244,10 +259,7 @@ public class GameScreen extends Screen
     var action:PlanAction = plan.fillPlan(tilemap.getCoordsByPoint(player.pos));
     if (action != null) {
       visualizer.update(plan);
-      tilemap.clearStack();
       scene.tilemap = tilemap;
-    } else {
-      tilemap.restoreMap();
     }
   }
 

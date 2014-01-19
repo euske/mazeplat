@@ -24,8 +24,9 @@ public class Actor
   public function Actor(scene:Scene)
   {
     _scene = scene;
-    _velocity = new Point(0, 0);
-    pos = new Point(0, 0);
+    _velocity = new Point();
+    pos = new Point();
+    frame = new Rectangle();
   }
 
   // scene
