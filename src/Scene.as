@@ -11,18 +11,30 @@ import flash.geom.Rectangle;
 public class Scene extends Sprite
 {
   private var _window:Rectangle;
+  private var _tilesize:int;
+  private var _tiles:BitmapData;
+  private var _actors:Array;
+  private var _mapimage:Bitmap;
+
   private var _tilemap:TileMap;
   private var _tilewindow:Rectangle;
-  private var _tiles:BitmapData;
-  private var _mapimage:Bitmap;
-  private var _actors:Array;
 
   // Scene(width, height, tilemap)
-  public function Scene(width:int, height:int, tiles:BitmapData)
+  public function Scene(width:int, height:int, tilesize:int, tiles:BitmapData)
   {
     _window = new Rectangle(0, 0, width, height);
+    _tilesize = tilesize;
     _tiles = tiles;
     _actors = new Array();
+    _mapimage = new Bitmap(new BitmapData(width+tilesize, height+tilesize, 
+					  true, 0x00000000));
+    addChild(_mapimage);
+  }
+
+  // tilesize
+  public function get tilesize():int
+  {
+    return _tilesize;
   }
 
   // tilemap
@@ -32,18 +44,8 @@ public class Scene extends Sprite
   }
   public function set tilemap(value:TileMap):void
   {
-    if (_mapimage != null) {
-      removeChild(_mapimage);
-      _mapimage = null;
-    }
     _tilemap = value;
     _tilewindow = new Rectangle();
-    if (_mapimage == null) {
-      _mapimage = new Bitmap(new BitmapData(_window.width+_tilemap.tilesize, 
-					    _window.height+_tilemap.tilesize, 
-					    true, 0x00000000));
-      addChild(_mapimage);
-    }
   }
 
   // window
@@ -82,31 +84,29 @@ public class Scene extends Sprite
       actor.skin.x = p.x+actor.frame.x;
       actor.skin.y = p.y+actor.frame.y;
     }
-    if (_tilemap != null && _mapimage != null) {
-      var tilesize:int = _tilemap.tilesize;
-      var x0:int = Math.floor(_window.left/tilesize);
-      var y0:int = Math.floor(_window.top/tilesize);
-      var x1:int = Math.ceil(_window.right/tilesize);
-      var y1:int = Math.ceil(_window.bottom/tilesize);
+    if (_tilemap != null) {
+      var x0:int = Math.floor(_window.left/_tilesize);
+      var y0:int = Math.floor(_window.top/_tilesize);
+      var x1:int = Math.ceil(_window.right/_tilesize);
+      var y1:int = Math.ceil(_window.bottom/_tilesize);
       var r:Rectangle = new Rectangle(x0, y0, x1-x0+1, y1-y0+1);
       if (!_tilewindow.equals(r)) {
 	renderTiles(r);
       }
-      _mapimage.x = (_tilewindow.x*tilesize)-_window.x;
-      _mapimage.y = (_tilewindow.y*tilesize)-_window.y;
+      _mapimage.x = (_tilewindow.x*_tilesize)-_window.x;
+      _mapimage.y = (_tilewindow.y*_tilesize)-_window.y;
     }
   }
 
   // renderTiles(x, y)
   private function renderTiles(r:Rectangle):void
   {
-    var tilesize:int = _tilemap.tilesize;
     for (var dy:int = 0; dy <= r.height; dy++) {
       for (var dx:int = 0; dx <= r.width; dx++) {
 	var i:int = _tilemap.getTile(r.x+dx, r.y+dy);
 	if (0 <= i) {
-	  var src:Rectangle = new Rectangle(i*tilesize, 0, tilesize, tilesize);
-	  var dst:Point = new Point(dx*tilesize, dy*tilesize);
+	  var src:Rectangle = new Rectangle(i*_tilesize, 0, _tilesize, _tilesize);
+	  var dst:Point = new Point(dx*_tilesize, dy*_tilesize);
 	  _mapimage.bitmapData.copyPixels(_tiles, src, dst);
 	}
       }
@@ -119,8 +119,8 @@ public class Scene extends Sprite
   {
     if (_tilemap != null) {
       // Center the window position.
-      var mapwidth:int = _tilemap.width*_tilemap.tilesize;
-      var mapheight:int = _tilemap.height*_tilemap.tilesize;
+      var mapwidth:int = _tilemap.width*_tilesize;
+      var mapheight:int = _tilemap.height*_tilesize;
       if (mapwidth < _window.width) {
 	_window.x = -(_window.width-mapwidth)/2;
       } else if (p.x-hmargin < _window.x) {
@@ -147,14 +147,13 @@ public class Scene extends Sprite
   // getCenteredBounds(center, margin)
   public function getCenteredBounds(center:Point, margin:int=0):Rectangle
   {
-    var tilesize:int = _tilemap.tilesize;
-    var x0:int = Math.floor(_window.left/tilesize);
+    var x0:int = Math.floor(_window.left/_tilesize);
     x0 = Math.max(x0-margin, 0);
-    var y0:int = Math.floor(_window.top/tilesize);
+    var y0:int = Math.floor(_window.top/_tilesize);
     y0 = Math.max(y0-margin, 0);
-    var x1:int = Math.ceil(_window.right/tilesize);
+    var x1:int = Math.ceil(_window.right/_tilesize);
     x1 = Math.min(x1+margin, _tilemap.width-1);
-    var y1:int = Math.ceil(_window.bottom/tilesize);
+    var y1:int = Math.ceil(_window.bottom/_tilesize);
     y1 = Math.min(y1+margin, _tilemap.height-1);
     return new Rectangle(x0, y0, x1-x0, y1-y0);
   }

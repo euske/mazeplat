@@ -62,8 +62,8 @@ public class Actor
   // tilebounds
   public function get tilebounds():Rectangle
   {
-    var w:int = frame.width/tilemap.tilesize;
-    var h:int = frame.height/tilemap.tilesize;
+    var w:int = frame.width/scene.tilesize;
+    var h:int = frame.height/scene.tilesize;
     return new Rectangle(0, -(h-1), w-1, h-1);
   }
 
@@ -132,13 +132,13 @@ public class Actor
       v = tilemap.getCollisionByRect(bounds, v.x, v.y, 
 				     Tile.isObstacle);
       pos = Utils.movePoint(pos, v.x, v.y);
-      _velocity = new Point(0, 0);
+      _velocity = new Point();
     } else if (isLanded()) {
       // moving.
       v = tilemap.getCollisionByRect(bounds, v.x, Math.max(0, v.y), 
 				     Tile.isObstacle);
       pos = Utils.movePoint(pos, v.x, v.y);
-      _velocity = new Point(0, 0);
+      _velocity = new Point();
     } else {
       // jumping/falling.
       _velocity = new Point(v.x, _velocity.y);

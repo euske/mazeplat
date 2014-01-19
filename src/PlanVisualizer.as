@@ -66,7 +66,7 @@ public class PlanVisualizer extends Shape
   }
   private function get tilesize():int
   {
-    return scene.tilemap.tilesize;
+    return scene.tilesize;
   }
 
   private function drawRect(color:uint, p:Point, size:int):void

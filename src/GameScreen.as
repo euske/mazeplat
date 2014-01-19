@@ -25,18 +25,18 @@ public class GameScreen extends Screen
   
   /// Game-related functions
 
+  public const tilesize:int = 16;
   private var scene:Scene;
   private var player:Player;
   private var visualizer:PlanVisualizer;
 
   public function GameScreen(width:int, height:int)
   {
-    var tilesize:int = 16;
     var tilemap:TileMap = new TileMap(tilesize, 
 				      Math.floor(width/tilesize), 
 				      Math.floor(height/tilesize));
 
-    scene = new Scene(width, height, tilesimage.bitmapData);
+    scene = new Scene(width, height, tilesize, tilesimage.bitmapData);
     scene.tilemap = tilemap;
     addChild(scene);
 
