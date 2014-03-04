@@ -258,8 +258,9 @@ public class GameScreen extends Screen
       tilemap.plan = new PlanMap(tilemap, tilemap.goal, tilemap.bounds,
 				 player.tilebounds, player.speed, 
 				 player.jumpspeed, player.gravity);
-      var action:PlanAction = tilemap.plan.fillPlan(tilemap.getCoordsByPoint(player.pos));
-      if (action == null) continue;
+      if (!tilemap.plan.fillPlan(tilemap.getCoordsByPoint(player.pos))) continue;
+      var cur:Point = tilemap.getCoordsByPoint(player.pos);
+      var action:PlanAction = tilemap.plan.getAction(cur.x, cur.y);
       tilemap.score = action.cost;
       _mapqueue.push(tilemap);
     }
