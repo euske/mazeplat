@@ -68,8 +68,8 @@ public class GameScreen extends Screen
     tilemap.goal = p;
     tilemap.setTile(tilemap.goal.x, tilemap.goal.y, Tile.GOAL);
 
-    player.pos = scene.getTilePoint(0, tilemap.height-1);
-    player.bounds = scene.getTileRect(0, tilemap.height-2, 1, 2);
+    player.pos = tilemap.getTilePoint(0, tilemap.height-1);
+    player.bounds = tilemap.getTileRect(0, tilemap.height-2, 1, 2);
 
     startUpdating(tilemap);
   }

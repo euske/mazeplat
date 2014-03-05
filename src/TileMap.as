@@ -139,12 +139,12 @@ public class TileMap
     return map;
   }
 
-  // findSimplePath(x0, y0, x1, x1, f, cb): 
+  // findSimplePath(x0, y0, x1, x1, map, cb): 
   //   returns a list of points that a character can proceed without being blocked.
   //   returns null if no such path exists. This function takes O(w*h).
   //   Note: this returns only a straightforward path without any detour.
   public function findSimplePath(x0:int, y0:int, x1:int, y1:int, 
-				 f:Function, cb:Rectangle):Array
+				 map:RangeMap, cb:Rectangle):Array
   {
     var a:Array = new Array();
     var w:int = Math.abs(x1-x0);
@@ -152,7 +152,6 @@ public class TileMap
     var inf:int = (w+h+1)*2;
     var vx:int = (x0 <= x1)? +1 : -1;
     var vy:int = (y0 <= y1)? +1 : -1;
-    var map:RangeMap = getRangeMap(f);
     for (var dy:int = 0; dy <= h; dy++) {
       a.push(new Array());
       // y: y0...y1
@@ -186,12 +185,24 @@ public class TileMap
     }
     // trace them in a reverse order: from goal to start.
     var r:Array = new Array();
-    e = a[h][w].next;
+    e = a[h][w];
     while (e != null) {
       r.push(e.p);
       e = e.next;
     }
     return r;
+  }
+
+  // getTilePoint(x, y): converts a point in the map to screen space.
+  public function getTilePoint(x:int, y:int):Point
+  {
+    return new Point(x*tilesize+tilesize/2, y*tilesize+tilesize/2);
+  }
+
+  // getTileRect(x, y): converts an area in the map to screen space.
+  public function getTileRect(x:int, y:int, w:int=1, h:int=1):Rectangle
+  {
+    return new Rectangle(x*tilesize, y*tilesize, w*tilesize, h*tilesize);
   }
 
   // getCoordsByPoint(p): converts a screen position to map coordinates.
@@ -217,6 +228,20 @@ public class TileMap
   {
     r = getCoordsByRect(r);
     return scanTile(r.left, r.top, r.right-1, r.bottom-1, f);
+  }
+
+  // getCollisionByRect(r, vx, vy, f): 
+  //   adjusts vector (vx,vy) so that the rectangle doesn't collide with a tile specified by f.
+  public function getCollisionByRect(r:Rectangle, vx:int, vy:int, f:Function):Point
+  {
+    var src:Rectangle = r.union(Utils.moveRect(r, vx, vy));
+    var a:Array = scanTileByRect(src, f);
+    var v:Point = new Point(vx, vy);
+    for each (var p:Point in a) {
+      var t:Rectangle = getTileRect(p.x, p.y);
+      v = Utils.collideRect(t, r, v);
+    }
+    return v;
   }
 
 }

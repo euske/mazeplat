@@ -62,8 +62,8 @@ public class Actor
   // tilebounds
   public function get tilebounds():Rectangle
   {
-    var w:int = frame.width/scene.tilesize;
-    var h:int = frame.height/scene.tilesize;
+    var w:int = frame.width/tilemap.tilesize;
+    var h:int = frame.height/tilemap.tilesize;
     return new Rectangle(0, -(h-1), w-1, h-1);
   }
 
@@ -74,8 +74,8 @@ public class Actor
 	    tilemap.getRangeMap(Tile.isStoppable).hasCollisionByRect(bounds, 0, 1));
   }
 
-  // isGrabbing()
-  public function isGrabbing():Boolean
+  // isHolding()
+  public function isHolding():Boolean
   {
     return tilemap.getRangeMap(Tile.isGrabbable).hasTileByRect(bounds);
   }
@@ -100,7 +100,7 @@ public class Actor
   // jump()
   public function jump():void
   {
-    if (isLanded() && !isGrabbing()) {
+    if (isLanded() && !isHolding()) {
       _velocity.y = -jumpspeed;
     }
   }
@@ -108,17 +108,17 @@ public class Actor
   // fall()
   public function fall():void
   {
-    if (!isGrabbing() && !isLanded()) {
+    if (!isHolding() && !isLanded()) {
       var v:Point;
       // falling (in x and y).
-      v = scene.getCollisionByRect(bounds, _velocity.x, _velocity.y, 
-				   Tile.isStoppable);
+      v = tilemap.getCollisionByRect(bounds, _velocity.x, _velocity.y, 
+				     Tile.isObstacle);
       // falling (in x).
-      v.x = scene.getCollisionByRect(bounds, _velocity.x, v.y, 
-				     Tile.isObstacle).x;
+      v.x = tilemap.getCollisionByRect(bounds, _velocity.x, v.y, 
+				       Tile.isObstacle).x;
       // falling (in y).
-      v.y = scene.getCollisionByRect(bounds, v.x, _velocity.y, 
-				     Tile.isStoppable).y;
+      v.y = tilemap.getCollisionByRect(bounds, v.x, _velocity.y, 
+				       Tile.isObstacle).y;
       pos = Utils.movePoint(pos, v.x, v.y);
       _velocity = new Point(v.x, Math.min(v.y+gravity, maxspeed));
     }
@@ -127,16 +127,16 @@ public class Actor
   // move(v)
   public function move(v:Point):void
   {
-    if (isGrabbing()) {
+    if (isHolding()) {
       // climing a ladder.
-      v = scene.getCollisionByRect(bounds, v.x, v.y, 
-				   Tile.isObstacle);
+      v = tilemap.getCollisionByRect(bounds, v.x, v.y, 
+				     Tile.isObstacle);
       pos = Utils.movePoint(pos, v.x, v.y);
       _velocity = new Point();
     } else if (isLanded()) {
       // moving.
-      v = scene.getCollisionByRect(bounds, v.x, Math.max(0, v.y), 
-				   Tile.isObstacle);
+      v = tilemap.getCollisionByRect(bounds, v.x, Math.max(0, v.y), 
+				     Tile.isObstacle);
       pos = Utils.movePoint(pos, v.x, v.y);
       _velocity = new Point();
     } else {
@@ -150,7 +150,7 @@ public class Actor
   {
     var v:Point = new Point(Utils.clamp(-speed, (p.x-pos.x), +speed),
 			    Utils.clamp(-speed, (p.y-pos.y), +speed));
-    if (isLanded() || isGrabbing()) {
+    if (isLanded() || isHolding()) {
       if (isMovable(v.x, v.y)) {
 	move(v);
       } else if (isMovable(0, v.y)) {
