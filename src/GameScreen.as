@@ -3,7 +3,6 @@ package {
 import flash.display.Shape;
 import flash.display.Bitmap;
 import flash.geom.Point;
-import flash.geom.Rectangle;
 import flash.events.Event;
 import flash.ui.Keyboard;
 
@@ -28,6 +27,7 @@ public class GameScreen extends Screen
   private var scene:Scene;
   private var player:Player;
   private var visualizer:PlanVisualizer;
+  private var _maker:MapMaker;
 
   public function GameScreen(width:int, height:int)
   {
@@ -72,6 +72,8 @@ public class GameScreen extends Screen
     player.bounds = tilemap.getTileRect(0, tilemap.height-2, 1, 2);
 
     startUpdating(tilemap);
+
+    scene.tilemap = tilemap;
   }
 
   // close()
@@ -82,7 +84,12 @@ public class GameScreen extends Screen
   // update()
   public override function update():void
   {
-    updateMap();
+    if (_maker != null) {
+      _maker.update();
+      visualizer.update(_maker.tilemap.plan);
+      scene.tilemap = _maker.tilemap;
+      Main.log("score="+_maker.tilemap.score);
+    }
 
     scene.update();
     scene.setCenter(player.pos, 100, 100);
@@ -170,110 +177,21 @@ public class GameScreen extends Screen
     return shape;
   }
 
-  private var _busy:Boolean;
-  private var _mapqueue:Array;
-  private const BEAM_SIZE:int = 10;
-
   private function startUpdating(tilemap:TileMap):void
   {
-    if (_busy) return;
-
-    addChild(textimage);
-    _busy = true;
-    _mapqueue = new Array();
-    _mapqueue.push(tilemap);
-
-    scene.tilemap = tilemap;
+    if (_maker == null) {
+      addChild(textimage);
+      _maker = new MapMaker(player, tilemap);
+    }
   }
 
   private function stopUpdating():void
   {
-    if (!_busy) return;
-
-    _busy = false;
-    _mapqueue = null;
-    removeChild(textimage);
-    visualizer.update(null);
-  }
-
-  private function updateMap():void
-  {
-    if (!_busy) return;
-
-    const N1:int = 8;
-
-    var tilemap:TileMap;
-    var n:int = _mapqueue.length;
-    for (var i:int = 0; i < n; i++) {
-      var x:int, y:int, w:int, h:int, dx:int, dy:int;
-      var m:int = Math.floor(Math.random()*6);
-      tilemap = _mapqueue[i].clone();
-      switch (m) {
-      case 0:
-      case 1:
-      // horizontal wall.
-	w = (int)(Math.random()*N1);
-	x = (int)(Math.random()*(tilemap.width-w));
-	y = (int)(Math.random()*tilemap.height);
-	for (dx = 0; dx < w; dx++) {
-	  tilemap.setTile(x+dx, y, Tile.BLOCK);
-	}
-	break;
-	
-      case 2:
-	// vertical wall.
-	h = (int)(Math.random()*N1);
-	x = (int)(Math.random()*tilemap.width);
-	y = (int)(Math.random()*(tilemap.height-h));
-	for (dy = 0; dy < h; dy++) {
-	  tilemap.setTile(x, y+dy, Tile.BLOCK);
-	}
-	break;
-	
-      case 3:
-	// vertical ladder.
-	h = (int)(Math.random()*N1);
-	x = (int)(Math.random()*tilemap.width);
-	y = (int)(Math.random()*(tilemap.height-h));
-	for (dy = 0; dy < h; dy++) {
-	  tilemap.setTile(x, y+dy, Tile.LADDER);
-	}
-	break;
-
-      default:
-	// 4, 5
-	// making a hole.
-	w = (int)(Math.random()*N1);
-	h = (int)(Math.random()*N1);
-	x = (int)(Math.random()*(tilemap.width-w));
-	y = (int)(Math.random()*(tilemap.height-h));
-	for (dy = 0; dy < h; dy++) {
-	  for (dx = 0; dx < w; dx++) {
-	    tilemap.setTile(x+dx, y+dy, Tile.NONE);
-	  }
-	}
-	break;
-      }
-
-      tilemap.plan = new PlanMap(tilemap, tilemap.goal, tilemap.bounds,
-				 player.tilebounds, player.speed, 
-				 player.jumpspeed, player.gravity);
-      if (!tilemap.plan.fillPlan(tilemap.getCoordsByPoint(player.pos))) continue;
-      var cur:Point = tilemap.getCoordsByPoint(player.pos);
-      var action:PlanAction = tilemap.plan.getAction(cur.x, cur.y);
-      tilemap.score = action.cost;
-      _mapqueue.push(tilemap);
-    }
-
-    _mapqueue.sortOn("score", Array.NUMERIC | Array.DESCENDING);
-    if (BEAM_SIZE < _mapqueue.length) {
-      _mapqueue.splice(BEAM_SIZE, _mapqueue.length-BEAM_SIZE);
-    }
-    if (0 < _mapqueue.length) {
-      tilemap = _mapqueue[0];
-      visualizer.update(tilemap.plan);
-      scene.tilemap = tilemap;
-      //Main.log("queue="+_mapqueue.length+", xscore="+tilemap.score);
+    if (_maker != null) {
+      scene.tilemap = _maker.tilemap;
+      _maker = null;
+      removeChild(textimage);
+      visualizer.update(null);
     }
   }
 }
