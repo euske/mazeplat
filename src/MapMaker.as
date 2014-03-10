@@ -15,6 +15,29 @@ public class MapMaker
 
   public function MapMaker(player:Player, tilemap:TileMap)
   {
+    tilemap.fillTile(0, 0, tilemap.width, tilemap.height, Tile.NONE);
+    var i:int = 0;
+    var p:Point;
+    while (true) {
+      var y:int = tilemap.height-i*3;
+      if (y <= 1) break;
+      for (var x:int = (i%2)*4; x < tilemap.width; x += 8) {
+	tilemap.setTile(x+0, y, Tile.BLOCK);
+	tilemap.setTile(x+1, y, Tile.BLOCK);
+	tilemap.setTile(x+2, y, Tile.BLOCK);
+	tilemap.setTile(x+3, y, Tile.BLOCK);
+	p = new Point(x+3, y-1);
+      }
+      i++;
+    }
+    tilemap.goal = p;
+    tilemap.setTile(0, tilemap.height-1, Tile.START);
+    tilemap.setTile(tilemap.goal.x, tilemap.goal.y, Tile.GOAL);
+
+    var p:Point = tilemap.findSpot(Tile.START);
+    player.pos = tilemap.getTilePoint(p.x, p.y);
+    player.bounds = tilemap.getTileRect(p.x, p.y-1, 1, 2);
+
     _player = player;
     _tilemap = tilemap;
     _mapqueue = new Array();

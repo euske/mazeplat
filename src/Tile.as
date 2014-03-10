@@ -6,9 +6,10 @@ package {
 public class Tile
 {
   public static const NONE:int = 0;
-  public static const BLOCK:int = 1;
-  public static const LADDER:int = 2;
-  public static const GOAL:int = 3;
+  public static const START:int = 1;
+  public static const GOAL:int = 2;
+  public static const BLOCK:int = 3;
+  public static const LADDER:int = 4;
 
   // isNone(b): true if b is empty.
   public static var isNone:Function = 

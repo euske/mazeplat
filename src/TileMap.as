@@ -244,6 +244,13 @@ public class TileMap
     return v;
   }
 
+  // findSpot
+  public function findSpot(i:int):Point
+  {
+    var a:Array = scanTile(0, 0, width, height, 
+			   (function (b:int):Boolean { return b == i; }));
+    return a[0];
+  }
 }
 
 } // package

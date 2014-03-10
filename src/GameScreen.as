@@ -50,29 +50,8 @@ public class GameScreen extends Screen
   public override function open():void
   {
     var tilemap:TileMap = scene.createTileMap();
-    tilemap.fillTile(0, 0, tilemap.width, tilemap.height, Tile.NONE);
-    var i:int = 0;
-    var p:Point;
-    while (true) {
-      var y:int = tilemap.height-i*3;
-      if (y <= 1) break;
-      for (var x:int = (i%2)*4; x < tilemap.width; x += 8) {
-	tilemap.setTile(x+0, y, Tile.BLOCK);
-	tilemap.setTile(x+1, y, Tile.BLOCK);
-	tilemap.setTile(x+2, y, Tile.BLOCK);
-	tilemap.setTile(x+3, y, Tile.BLOCK);
-	p = new Point(x+3, y-1);
-      }
-      i++;
-    }
-    tilemap.goal = p;
-    tilemap.setTile(tilemap.goal.x, tilemap.goal.y, Tile.GOAL);
-
-    player.pos = tilemap.getTilePoint(0, tilemap.height-1);
-    player.bounds = tilemap.getTileRect(0, tilemap.height-2, 1, 2);
 
     startUpdating(tilemap);
-
     scene.tilemap = tilemap;
   }
 
