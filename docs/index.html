@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>Automatic Platformer Level Generation</title>
+</head>
+<body>
+<h1>Automatic Platformer Level Generation</h1>
+
+<h2>Background</h2>
+<p>
+I've been experimenting on a platformer game with randomly generated
+levels. A randomized game is one of suitable approaches for
+short/indie games that can be played repeatedly. There are several
+known algorithms for random maze generation in a 2D plane, but a
+platformer game has additional requirements that make it a tricky
+problem to handle. Our goal is to make a random level that is
+solvable, i.e. the player can reach its predetermined goal.  In this
+experiment, we used a platformer pathfinding library in order to
+guarantee its solvablility. I have a working prototype and its source
+code. The source code is published under MIT/X License (i.e. it's
+freely available.)
+
+<ul>
+<li> <a href="http://ludumdare.tabesugi.net/mazeplat/">Playable prototype</a>
+<li> <a href="https://github.com/euske/mazeplat/">GitHub</a>
+</ul>
+
+<h2>Method</h2>
+<p>
+The basic algorithm of level generation is the following:
+<ol>
+<li> Start from an initial (seed) pattern.
+<li> Iteratively alter the level while maintaining its solvability.
+<li> Stop when the level is good enough.
+</ol>
+<p>
+This problem can be formulated as tree searching. At each step in
+stage 2, there are a number of ways to change the configuration, such
+as adding a wall, removing a floor, or adding a ladder, etc.  This is
+equivalent to traversing a tree with a number of different
+branches. It's not practical to consider all the possibilities at
+each step because its number can easily grow exponentially, so we
+maintain a limited set of the best results only and expand them
+iteratively.  This strategy is known as "beam search". Although it
+does not guarantee the optimal solution, with a sufficiently good
+evaluation funtion it can give good enough results.
+
+<h2>Implementation</h2>
+<p>
+Seed patterns:
+<p>
+Alternation methods:
+<p>
+Evaluation functions: map complexity and path complexity
+<p>
+Now, the question is what map is considered "good"?
+
+<h2>Results</h2>
+
