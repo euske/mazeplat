@@ -29,10 +29,12 @@ public class GameScreen extends Screen
   private var visualizer:PlanVisualizer;
   private var _maker:MapMaker;
 
-  public function GameScreen(width:int, height:int)
+  public function GameScreen(width:int, height:int, scale:int=2)
   {
     var tilesize:int = 16;
-    scene = new Scene(width, height, tilesize, tilesimage.bitmapData);
+    scene = new Scene(width/scale, height/scale, tilesize, tilesimage.bitmapData);
+    scene.width *= scale;
+    scene.height *= scale;
     addChild(scene);
 
     player = new Player(scene);
