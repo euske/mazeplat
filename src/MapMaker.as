@@ -32,7 +32,7 @@ public class MapMaker
       a = new Array();
       for (var x:int = (i%2)*HSCALE; x < tilemap.width; x += HSCALE*2) {
 	for (var dx:int = 0; dx < HSCALE; dx++) {
-	  tilemap.setTile(x+dx, y, Tile.BLOCK);
+	  tilemap.setTile(x+dx, y, Tile.FLOOR);
 	}
 	a.push(new Point(x+HSCALE-1, y-1));
       }
@@ -81,7 +81,7 @@ public class MapMaker
 	x = rnd((tilemap.width-w)/hscale)*hscale;
 	y = rnd((tilemap.height)/vscale)*vscale;
 	for (dx = 0; dx < w; dx++) {
-	  tilemap.setTile(x+dx, y, Tile.BLOCK);
+	  tilemap.setTile(x+dx, y, Tile.FLOOR);
 	}
 	break;
 	
@@ -90,8 +90,8 @@ public class MapMaker
 	h = vscale;
 	x = rnd((tilemap.width)/hscale)*hscale;
 	y = rnd((tilemap.height-h)/vscale)*vscale;
-	for (dy = 0; dy < h; dy++) {
-	  tilemap.setTile(x, y+dy, Tile.BLOCK);
+	for (dy = 0; dy <= h; dy++) {
+	  tilemap.setTile(x, y+dy, Tile.WALL);
 	}
 	break;
 	
@@ -106,20 +106,22 @@ public class MapMaker
 	}
 	break;
 
-      default:
-	// 5
-	// Removing an existing floor/wall.
+      case 5:
+	// Removing an existing floor.
 	w = (rnd(4)+1)*hscale;
 	h = (rnd(4)+1)*vscale;
 	x = rnd((tilemap.width-w)/hscale)*hscale;
 	y = rnd((tilemap.height-h)/vscale)*vscale;
 	for (dy = 0; dy < h; dy++) {
 	  for (dx = 0; dx < w; dx++) {
-	    if (tilemap.getTile(x+dx, y+dy) == Tile.BLOCK) {
+	    if (tilemap.getTile(x+dx, y+dy) == Tile.FLOOR) {
 	      tilemap.setTile(x+dx, y+dy, Tile.NONE);
 	    }
 	  }
 	}
+	break;
+
+      default:
 	break;
       }
 
@@ -159,12 +161,18 @@ public class MapMaker
     var n:int = 0;
     for (var y:int = 0; y < tilemap.height; y++) {
       for (var x:int = 0; x < tilemap.width; x++) {
-	var c:int = tilemap.getTile(x, y);
 	// Different from the initial seed = good.
-	if ((y % VSCALE) == 0) {
-	  if (c == Tile.NONE) n++;
-	} else {
-	  if (c == Tile.BLOCK) n++;
+	var c:int = tilemap.getTile(x, y);
+	switch (c) {
+	case Tile.NONE:
+	  if ((y % VSCALE) == 0) n++;
+	  break;
+	case Tile.FLOOR:
+	  if ((y % VSCALE) != 0) n++;
+	  break;
+	case Tile.WALL:
+	  n++;
+	  break;
 	}
       }
     }
