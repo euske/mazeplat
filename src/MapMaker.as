@@ -19,6 +19,7 @@ public class MapMaker
   {
     // Create an initial setup.
     tilemap.fillTile(0, 0, tilemap.width, tilemap.height, Tile.NONE);
+
     var a:Array;
     var i:int = 0;
     for (var y:int = tilemap.height-VSCALE; 2 <= y; y -= VSCALE) {
@@ -73,25 +74,29 @@ public class MapMaker
 
       var x:int, y:int, w:int, h:int, dx:int, dy:int;
       // Perform one of the following operations randomly:
-      switch (rnd(6)) {
+      switch (rnd(7)) {
       case 0:
       case 1:
 	// Add a random floor.
 	w = (rnd(3)+1)*hscale;
 	x = rnd((tilemap.width-w)/hscale)*hscale;
 	y = rnd((tilemap.height)/vscale)*vscale;
-	for (dx = 0; dx < w; dx++) {
-	  tilemap.setTile(x+dx, y, Tile.FLOOR);
+	if (tilemap.goal.x < x || x+w <= tilemap.goal.x || tilemap.goal.y != y) {
+	  for (dx = 0; dx < w; dx++) {
+	    tilemap.setTile(x+dx, y, Tile.FLOOR);
+	  }
 	}
 	break;
 	
       case 2:
 	// Add a random wall.
-	h = vscale;
+	h = vscale+1;
 	x = rnd((tilemap.width)/hscale)*hscale;
 	y = rnd((tilemap.height-h)/vscale)*vscale;
-	for (dy = 0; dy <= h; dy++) {
-	  tilemap.setTile(x, y+dy, Tile.WALL);
+	if (tilemap.goal.x != x || tilemap.goal.y < y || y+h <= tilemap.goal.y) {
+	  for (dy = 0; dy < h; dy++) {
+	    tilemap.setTile(x, y+dy, Tile.WALL);
+	  }
 	}
 	break;
 	
@@ -101,8 +106,10 @@ public class MapMaker
 	h = (rnd(3)+1)*vscale;
 	x = rnd(tilemap.width);
 	y = rnd((tilemap.height-h)/vscale)*vscale;
-	for (dy = 0; dy < h; dy++) {
-	  tilemap.setTile(x, y+dy, Tile.LADDER);
+	if (tilemap.goal.x != x || tilemap.goal.y < y || y+h <= tilemap.goal.y) {
+	  for (dy = 0; dy < h; dy++) {
+	    tilemap.setTile(x, y+dy, Tile.LADDER);
+	  }
 	}
 	break;
 
@@ -115,6 +122,21 @@ public class MapMaker
 	for (dy = 0; dy < h; dy++) {
 	  for (dx = 0; dx < w; dx++) {
 	    if (tilemap.getTile(x+dx, y+dy) == Tile.FLOOR) {
+	      tilemap.setTile(x+dx, y+dy, Tile.NONE);
+	    }
+	  }
+	}
+	break;
+
+      case 6:
+	// Removing an existing ladder.
+	w = (rnd(4)+1)*hscale;
+	h = (rnd(4)+1)*vscale;
+	x = rnd((tilemap.width-w)/hscale)*hscale;
+	y = rnd((tilemap.height-h)/vscale)*vscale;
+	for (dy = 0; dy < h; dy++) {
+	  for (dx = 0; dx < w; dx++) {
+	    if (tilemap.getTile(x+dx, y+dy) == Tile.LADDER) {
 	      tilemap.setTile(x+dx, y+dy, Tile.NONE);
 	    }
 	  }
@@ -172,6 +194,9 @@ public class MapMaker
 	  break;
 	case Tile.WALL:
 	  n++;
+	  break;
+	case Tile.LADDER:
+	  n--;
 	  break;
 	}
       }
