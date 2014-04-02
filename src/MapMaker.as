@@ -62,13 +62,15 @@ public class MapMaker
   // update(): alter the map by one step.
   public function update():void
   {
-    var tilemap:TileMap;
     var hscale:int = HSCALE/2;
     var vscale:int = VSCALE;
 
-    var n:int = _mapqueue.length;
-    for (var i:int = 0; i < n; i++) {
-      tilemap = _mapqueue[i].clone();
+    var queue:Array = new Array();
+    for (var i:int = 0; i < _mapqueue.length && i < BEAM_SIZE; i++) {
+      var tilemap:TileMap = _mapqueue[i];
+      queue.push(tilemap);
+      tilemap = tilemap.clone();
+
       var x:int, y:int, w:int, h:int, dx:int, dy:int;
       // Perform one of the following operations randomly:
       switch (rnd(6)) {
@@ -131,20 +133,18 @@ public class MapMaker
 	if (action != null) {
 	  // Found a path. Assign the score to this map.
 	  tilemap.score = scoreAction(action)+scoreTiles(tilemap);
-	  _mapqueue.push(tilemap);
+	  queue.push(tilemap);
 	}
       }
     }
 
     // Sort the maps by its score.
-    _mapqueue.sortOn("score", Array.NUMERIC | Array.DESCENDING);
-    if (BEAM_SIZE < _mapqueue.length) {
-      _mapqueue.splice(BEAM_SIZE, _mapqueue.length-BEAM_SIZE);
+    queue.sortOn("score", Array.NUMERIC | Array.DESCENDING);
+    if (0 < queue.length) {
+      _tilemap = queue[0];
     }
-    if (0 < _mapqueue.length) {
-      _tilemap = _mapqueue[0];
-    }
-    Main.log("queue="+_mapqueue.length);
+    Main.log("queue="+queue.length);
+    _mapqueue = queue;
   }
 
   // rnd(n): generate random number 0...(n-1)
