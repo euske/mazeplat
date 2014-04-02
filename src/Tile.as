@@ -14,7 +14,7 @@ public class Tile
 
   // isNone(b): true if b is empty.
   public static var isNone:Function = 
-    (function (b:int):Boolean { return b == NONE || b == GOAL; });
+    (function (b:int):Boolean { return b == NONE || b == START || b == GOAL; });
 
   // isObstacle(b): true if b is an obstacle.
   public static var isObstacle:Function = 
@@ -22,7 +22,7 @@ public class Tile
 
   // isStoppable(b): true if b blocks jumping/falling.
   public static var isStoppable:Function = 
-    (function (b:int):Boolean { return b != NONE && b != GOAL; });
+    (function (b:int):Boolean { return b != NONE && b != START && b != GOAL; });
 
   // isGrabbable(b): true if b is a ladder.
   public static var isGrabbable:Function = 
