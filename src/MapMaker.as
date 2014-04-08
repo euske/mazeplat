@@ -17,33 +17,6 @@ public class MapMaker
   
   public function MapMaker(player:Player, tilemap:TileMap)
   {
-    // Create an initial setup.
-    tilemap.fillTile(0, 0, tilemap.width, tilemap.height, Tile.NONE);
-
-    var a:Array;
-    var i:int = 0;
-    for (var y:int = tilemap.height-VSCALE; 2 <= y; y -= VSCALE) {
-      // Make shifting steps:
-      //  |HSCALE|
-      //   ======       --
-      //                 |
-      //              VSCALE
-      //                 |
-      //         ====== --
-      a = new Array();
-      for (var x:int = (i%2)*HSCALE; x < tilemap.width; x += HSCALE*2) {
-	for (var dx:int = 0; dx < HSCALE; dx++) {
-	  tilemap.setTile(x+dx, y, Tile.FLOOR);
-	}
-	a.push(new Point(x+HSCALE-1, y-1));
-      }
-      i++;
-    }
-    // Set the initial/goal position.
-    tilemap.goal = a[rnd(a.length)];
-    tilemap.setTile(rnd(tilemap.width), tilemap.height-1, Tile.START);
-    tilemap.setTile(tilemap.goal.x, tilemap.goal.y, Tile.GOAL);
-
     var p:Point = tilemap.findSpot(Tile.START);
     player.pos = tilemap.getTilePoint(p.x, p.y);
     player.bounds = tilemap.getTileRect(p.x, p.y-1, 1, 2);

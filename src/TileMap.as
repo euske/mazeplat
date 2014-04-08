@@ -44,6 +44,8 @@ public class TileMap
 	_tilevalue[c] = i;
       }
     }
+
+    this.goal = findSpot(Tile.GOAL);
   }
 
   // width: returns the map width.

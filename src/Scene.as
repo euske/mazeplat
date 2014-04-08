@@ -19,6 +19,11 @@ public class Scene extends Sprite
   private var _tilemap:TileMap;
   private var _tilewindow:Rectangle;
 
+  // Seed1 map
+  [Embed(source="../assets/seed1.png", mimeType="image/png")]
+  private static const Seed1ImageCls:Class;
+  private static const seed1image:Bitmap = new Seed1ImageCls();
+
   // Scene(width, height, tilemap)
   public function Scene(width:int, height:int, tilesize:int, tiles:BitmapData)
   {
@@ -120,14 +125,10 @@ public class Scene extends Sprite
     var w:int = Math.floor(_window.width/_tilesize);
     var h:int = Math.floor(_window.height/_tilesize)+1;
     var bitmap:BitmapData = new BitmapData(w, h, false);
-    bitmap.setPixel(0, 0, 0x000000);
-    bitmap.setPixel(1, 0, 0xff0000);
-    bitmap.setPixel(2, 0, 0x00ff00);
-    bitmap.setPixel(3, 0, 0xffff00);
-    bitmap.setPixel(4, 0, 0x0000ff);
-    bitmap.setPixel(5, 0, 0xff00ff);
-    bitmap.setPixel(6, 0, 0x00ffff);
-    bitmap.setPixel(7, 0, 0xffffff);
+    // Copy the seed.
+    bitmap.copyPixels(seed1image.bitmapData, 
+		      new Rectangle(0, 0, w, h), 
+		      new Point());
     return new TileMap(bitmap, _tilesize);
   }
 
