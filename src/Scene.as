@@ -117,9 +117,18 @@ public class Scene extends Sprite
   // createTileMap
   public function createTileMap():TileMap
   {
-    return new TileMap(_tilesize, 
-		       Math.floor(_window.width/_tilesize),
-		       Math.floor(_window.height/_tilesize));
+    var w:int = Math.floor(_window.width/_tilesize);
+    var h:int = Math.floor(_window.height/_tilesize)+1;
+    var bitmap:BitmapData = new BitmapData(w, h, false);
+    bitmap.setPixel(0, 0, 0x000000);
+    bitmap.setPixel(1, 0, 0xff0000);
+    bitmap.setPixel(2, 0, 0x00ff00);
+    bitmap.setPixel(3, 0, 0xffff00);
+    bitmap.setPixel(4, 0, 0x0000ff);
+    bitmap.setPixel(5, 0, 0xff00ff);
+    bitmap.setPixel(6, 0, 0x00ffff);
+    bitmap.setPixel(7, 0, 0xffffff);
+    return new TileMap(bitmap, _tilesize);
   }
 
   // setCenter(p)
