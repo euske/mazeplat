@@ -10,7 +10,6 @@ import flash.utils.Dictionary;
 //
 public class TileMap
 {
-  public var goal:Point;
   public var score:int;
   public var plan:PlanMap;
 
@@ -44,8 +43,6 @@ public class TileMap
 	_tilevalue[c] = i;
       }
     }
-
-    this.goal = findSpot(Tile.GOAL);
   }
 
   // width: returns the map width.
@@ -68,7 +65,6 @@ public class TileMap
   public function clone():TileMap
   {
     var tilemap:TileMap = new TileMap(bitmap.clone(), tilesize);
-    tilemap.goal = goal;
     tilemap.score = score;
     return tilemap;
   }

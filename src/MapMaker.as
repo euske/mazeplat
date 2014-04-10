@@ -13,16 +13,14 @@ public class MapMaker
 
   private var _player:Player;
   private var _tilemap:TileMap;
+  private var _goal:Point;
   private var _mapqueue:Array;	// Array of candidate maps.
   
-  public function MapMaker(player:Player, tilemap:TileMap)
+  public function MapMaker(player:Player, tilemap:TileMap, goal:Point)
   {
-    var p:Point = tilemap.findSpot(Tile.START);
-    player.pos = tilemap.getTilePoint(p.x, p.y);
-    player.bounds = tilemap.getTileRect(p.x, p.y-1, 1, 2);
-
     _player = player;
     _tilemap = tilemap;
+    _goal = goal;
     _mapqueue = new Array();
     _mapqueue.push(tilemap);
   }
@@ -54,7 +52,7 @@ public class MapMaker
 	w = (rnd(3)+1)*hscale;
 	x = rnd((tilemap.width-w)/hscale)*hscale;
 	y = rnd((tilemap.height)/vscale)*vscale;
-	if (tilemap.goal.x < x || x+w <= tilemap.goal.x || tilemap.goal.y != y) {
+	if (_goal.x < x || x+w <= _goal.x || _goal.y != y) {
 	  for (dx = 0; dx < w; dx++) {
 	    tilemap.setTile(x+dx, y, Tile.FLOOR);
 	  }
@@ -66,7 +64,7 @@ public class MapMaker
 	h = vscale+1;
 	x = rnd((tilemap.width)/hscale)*hscale;
 	y = rnd((tilemap.height-h)/vscale)*vscale;
-	if (tilemap.goal.x != x || tilemap.goal.y < y || y+h <= tilemap.goal.y) {
+	if (_goal.x != x || _goal.y < y || y+h <= _goal.y) {
 	  for (dy = 0; dy < h; dy++) {
 	    tilemap.setTile(x, y+dy, Tile.WALL);
 	  }
@@ -79,7 +77,7 @@ public class MapMaker
 	h = (rnd(3)+1)*vscale;
 	x = rnd(tilemap.width);
 	y = rnd((tilemap.height-h)/vscale)*vscale;
-	if (tilemap.goal.x != x || tilemap.goal.y < y || y+h <= tilemap.goal.y) {
+	if (_goal.x != x || _goal.y < y || y+h <= _goal.y) {
 	  for (dy = 0; dy < h; dy++) {
 	    tilemap.setTile(x, y+dy, Tile.LADDER);
 	  }
@@ -121,7 +119,7 @@ public class MapMaker
       }
 
       // Try to find a path from the start to goal.
-      tilemap.plan = new PlanMap(tilemap, tilemap.goal, tilemap.bounds,
+      tilemap.plan = new PlanMap(tilemap, _goal, tilemap.bounds,
 				 _player.tilebounds, _player.speed, 
 				 _player.jumpspeed, _player.gravity);
       if (tilemap.plan.fillPlan(tilemap.getCoordsByPoint(_player.pos))) {

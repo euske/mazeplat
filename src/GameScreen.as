@@ -53,6 +53,9 @@ public class GameScreen extends Screen
   {
     var tilemap:TileMap = scene.createTileMap();
 
+    var p:Point = tilemap.findSpot(Tile.START);
+    player.pos = tilemap.getTilePoint(p.x, p.y);
+    player.bounds = tilemap.getTileRect(p.x, p.y-1, 1, 2);
     startUpdating(tilemap);
     scene.tilemap = tilemap;
   }
@@ -76,7 +79,7 @@ public class GameScreen extends Screen
     scene.setCenter(player.pos, 100, 100);
     scene.paint();
 
-    if (scene.tilemap.getCoordsByPoint(player.pos).equals(scene.tilemap.goal)) {
+    if (0 < scene.tilemap.scanTileByRect(player.bounds, Tile.isGoal).length) {
       dispatchEvent(new ScreenEvent(NAME));
     }
   }
@@ -162,7 +165,7 @@ public class GameScreen extends Screen
   {
     if (_maker == null) {
       addChild(textimage);
-      _maker = new MapMaker(player, tilemap);
+      _maker = new MapMaker(player, tilemap, tilemap.findSpot(Tile.GOAL));
     }
   }
 
